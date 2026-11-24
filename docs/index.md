@@ -1,6 +1,7 @@
 ---
 hide:
   - toc
+  - footer
 icon: material/home
 ---
 
