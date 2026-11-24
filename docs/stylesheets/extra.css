@@ -34,7 +34,7 @@
 }
 
 .md-typeset .home-hero a .twemoji svg {
-  fill: currentColor;
+  fill: #26a5e4;
 }
 
 .md-typeset .grid.cards {
@@ -45,8 +45,8 @@
   flex-shrink: 0;
 }
 
-/* Палитра иконки: черный, желтый #F5C400, белый.
-   Ссылки в светлой теме #6B4F00: контраст на белом около 7.6:1. */
+/* Светлая тема: текст черный и синий, желтый только заливка и обводка.
+   Темная тема задана отдельно и здесь не перекрашивается. */
 :root,
 [data-md-color-scheme="default"] {
   --md-primary-fg-color: #111111;
@@ -54,9 +54,14 @@
   --md-primary-fg-color--dark: #000000;
   --md-primary-bg-color: #ffffff;
   --md-primary-bg-color--light: #ffffffb3;
-  --md-accent-fg-color: #f5c400;
-  --md-accent-fg-color--transparent: #f5c40026;
-  --md-typeset-a-color: #6b4f00;
+  --md-accent-fg-color: #1a5fb4;
+  --md-accent-fg-color--transparent: #1a5fb41a;
+  --md-typeset-a-color: #1a5fb4;
+  --md-default-fg-color: #111111;
+}
+
+[data-md-color-scheme="slate"][data-md-color-primary="blue-grey"] {
+  --md-typeset-a-color: #f5c400;
 }
 
 [data-md-color-scheme="slate"] {
@@ -147,9 +152,40 @@
   box-shadow: 0 0.15rem 0.5rem #f5c40033;
 }
 
+[data-md-color-scheme="default"] .md-typeset h1,
+[data-md-color-scheme="default"] .md-typeset h2,
+[data-md-color-scheme="default"] .md-typeset h3,
+[data-md-color-scheme="default"] .md-typeset h4 {
+  color: #111111;
+}
+
+[data-md-color-scheme="default"] .md-typeset a:not(.md-button):hover,
+[data-md-color-scheme="default"] .md-path a:hover {
+  color: #0d3d80;
+  text-decoration: underline;
+}
+
+[data-md-color-scheme="default"] .md-path a {
+  color: #1a5fb4;
+}
+
+[data-md-color-scheme="default"] .md-footer__link,
+[data-md-color-scheme="default"] .md-footer__direction,
+[data-md-color-scheme="default"] .md-footer__title,
+[data-md-color-scheme="default"] .md-footer__link:hover {
+  color: #ffffff;
+}
+
+[data-md-color-scheme="default"] .md-nav__link:hover,
 [data-md-color-scheme="default"] .md-nav__link--active,
 [data-md-color-scheme="default"] .md-nav__item--active > .md-nav__link {
-  color: #6b4f00;
+  color: #111111;
+}
+
+[data-md-color-scheme="default"] .md-nav__link--active,
+[data-md-color-scheme="default"] .md-nav__item--active > .md-nav__link {
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 #f5c400;
 }
 
 [data-md-color-scheme="slate"] .md-nav__link--active,
