@@ -13,3 +13,26 @@
   height: auto;
 }
 
+.md-typeset .home-hero h1 {
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.md-typeset .home-hero p {
+  margin: 0.35rem 0;
+  font-size: 1.05rem;
+}
+
+.md-typeset .home-hero .md-button {
+  margin: 0.85rem 0.5rem 0 0;
+}
+
+.md-typeset .grid.cards {
+  margin-top: 1.75rem;
+}
+
+.md-nav__link svg {
+  flex-shrink: 0;
+}
+
