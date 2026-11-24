@@ -8,7 +8,13 @@ docs_dir: docs
 use_directory_urls: true
 theme:
   name: material
+  custom_dir: overrides
   language: ru
+  favicon: assets/favicon.png
+  logo: assets/logo.png
+  font:
+    text: Roboto
+    code: Roboto Mono
   features:
     - navigation.sections
     - navigation.indexes
@@ -18,23 +24,22 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+    - navigation.footer
   palette:
-    - media: "(prefers-color-scheme)"
-      toggle:
-        icon: material/brightness-auto
-        name: Системная тема
-    - scheme: default
-      primary: brown
-      accent: deep orange
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: teal
       toggle:
         icon: material/weather-night
-        name: Темная тема
-    - scheme: slate
-      primary: brown
-      accent: deep orange
+        name: Включить темную тему
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: teal
       toggle:
         icon: material/weather-sunny
-        name: Светлая тема
+        name: Включить светлую тему
 nav:
   - Главная: index.md
   - "Глоссарий": "glossariy.md"
@@ -81,7 +86,6 @@ nav:
       - "7.3. Тест-кейсы Релиза 1": "07-proverka/7.3-test-keysy-reliza-1.md"
       - "7.4. Чек-лист приемки": "07-proverka/7.4-chek-list-priemki.md"
   - "Приложение А. Исходники схем": "prilozhenie-a.md"
-  - "Спецификация API": "05-api/5.3-specifikaciya-openapi.md"
 plugins:
   - search:
       lang: ru
@@ -89,6 +93,8 @@ plugins:
       docExpansion: list
       filter: true
       tryItOutEnabled: true
+hooks:
+  - hooks/nav_icons.py
 markdown_extensions:
   - attr_list
   - md_in_html
@@ -97,6 +103,11 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+extra:
+  generator: false
 extra_css:
   - stylesheets/extra.css
 validation:

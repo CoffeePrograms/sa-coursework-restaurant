@@ -1,91 +1,140 @@
+---
+hide:
+  - toc
+  - footer
+icon: material/home
+---
+
+<div class="home-hero" markdown>
+
 # Приложение для заказа + табло
 
-Курсовой проект
+Курсовой проект, OTUS «Системный аналитик. Advanced», 2026
 
-по программе OTUS «Системный аналитик. Advanced»
+Липова Эльвира Евгеньевна · [:fontawesome-brands-telegram: @lipova_ee](https://t.me/lipova_ee)
 
-на тему: «Приложение для заказа + табло»
+[Начать читать](01-biznes-trebovaniya/1.1-obekt-avtomatizacii.md){ .md-button .md-button--primary }
+[Спецификация API](05-api/5.3-specifikaciya-openapi.md){ .md-button }
 
-Выполнила: Липова Эльвира Евгеньевна
+</div>
 
-2026
+## О проекте
 
-Telegram: [@lipova_ee](https://t.me/lipova_ee)
+Киоск самообслуживания, табло готовности и панель персонала для ресторана быстрого обслуживания. Гость платит через эквайринг, чек уходит в ККТ и ОФД по 54-ФЗ, гость отмечается во внешней лояльности, кухня получает оплаченный заказ.
 
-## [1.1. Объект автоматизации](01-biznes-trebovaniya/1.1-obekt-avtomatizacii.md)
+Эльвира сделала аналитику и проектирование целиком: от бизнес-целей до тест-кейсов.
 
-Объект автоматизации — ресторан формата QSR (quick service restaurant, предприятие быстрого обслуживания) с самообслуживанием. В MVP гость оформляет заказ на киоске, при желании идентифицируется QR внешней системы лояльности, оплачивает заказ; кухня выполняет заказ, статус готовности отображается на табло. В Релизе 1 заказ доступен в мобильном приложении, в Релизе 2 — оценки, отзывы и отчеты. Границы проекта — в [разделе 1.6](01-biznes-trebovaniya/1.6-granicy.md).
+<p class="stat-row">
+  <span>21 история</span>
+  <span>129 критериев приемки</span>
+  <span>24 правила</span>
+  <span>16 НФТ</span>
+  <span>32 операции API</span>
+  <span>114 тест-кейсов</span>
+  <span>15 схем</span>
+</p>
 
-## [1.2. Цели проекта](01-biznes-trebovaniya/1.2-celi-proekta.md)
+## Что посмотреть за 5 минут
 
-Сократить очереди и время от выбора блюда до оплаты.
+- [2.3. Ограничения и правила](02-trebovaniya/2.3-ogranicheniya-i-pravila.md) — цена, акции, оплата, кухня и торговый день.
+- [4.2. Диаграмма компонентов](04-arhitektura/4.2-diagramma-komponentov.md) — системный контекст и контейнеры, C4.
+- [5.3. Спецификация OpenAPI](05-api/5.3-specifikaciya-openapi.md) — 32 операции в Swagger UI.
+- [7.2. Тест-кейсы MVP](07-proverka/7.2-test-keysy-mvp.md) — проверки историй MVP.
 
-Снизить ошибки передачи заказа на кухню.
+## Схема
 
-Обеспечить гостю понятный статус заказа до выдачи.
+Статусная модель заказа, [раздел 3.5](03-informacionnaya-model/3.5-perechisleniya-i-statusnye-modeli.md).
 
-## Разделы
+<div class="scheme-preview" markdown>
 
-- [Глоссарий](glossariy.md)
+[![Статусная модель заказа](assets/images/risunok-3-2.png)](03-informacionnaya-model/3.5-perechisleniya-i-statusnye-modeli.md)
 
-1\. Бизнес-требования ко всему приложению
+</div>
 
-- [1.1. Объект автоматизации](01-biznes-trebovaniya/1.1-obekt-avtomatizacii.md)
-- [1.2. Цели проекта](01-biznes-trebovaniya/1.2-celi-proekta.md)
-- [1.3. Требования бизнеса](01-biznes-trebovaniya/1.3-trebovaniya-biznesa.md)
-- [1.4. Метрики успеха](01-biznes-trebovaniya/1.4-metriki-uspeha.md)
-- [1.5. Бизнес-процессы](01-biznes-trebovaniya/1.5-biznes-processy.md)
-- [1.6. Границы](01-biznes-trebovaniya/1.6-granicy.md)
+<div class="grid cards" markdown>
 
-2\. Задокументированные требования к приложению
+- :material-book-alphabet:{ .lg .middle } __Глоссарий__
 
-- [2.1. Назначение, границы и основания](02-trebovaniya/2.1-naznachenie-granicy-i-osnovaniya.md)
-- [2.2. Роли и участники взаимодействия](02-trebovaniya/2.2-roli-i-uchastniki-vzaimodeystviya.md)
-- [2.3. Ограничения и правила](02-trebovaniya/2.3-ogranicheniya-i-pravila.md)
-- [2.4. Нефункциональные требования](02-trebovaniya/2.4-nefunkcionalnye-trebovaniya.md)
-- [2.5. Пользовательские истории](02-trebovaniya/2.5-polzovatelskie-istorii.md)
-- [2.6. Карта пользовательских историй](02-trebovaniya/2.6-karta-polzovatelskih-istoriy.md)
+    ---
 
-3\. Спроектированная информационная модель
+    Термины, которые используются в документе.
 
-- [3.1. Назначение модели](03-informacionnaya-model/3.1-naznachenie-modeli.md)
-- [3.2. Диаграмма классов](03-informacionnaya-model/3.2-diagramma-klassov.md)
-- [3.3. Описание сущностей](03-informacionnaya-model/3.3-opisanie-suschnostey.md)
-- [3.4. Связи и кратность](03-informacionnaya-model/3.4-svyazi-i-kratnost.md)
-- [3.5. Перечисления и статусные модели](03-informacionnaya-model/3.5-perechisleniya-i-statusnye-modeli.md)
+    [:octicons-arrow-right-24: Глоссарий](glossariy.md)
 
-4\. Спроектированная компонентная архитектура
+- :material-silverware-fork-knife:{ .lg .middle } __1. Бизнес-требования__
 
-- [4.1. Обоснование выбора архитектурного стиля](04-arhitektura/4.1-obosnovanie-vybora-arhitekturnogo-stilya.md)
-- [4.2. Диаграмма компонентов](04-arhitektura/4.2-diagramma-komponentov.md)
-- [4.3. Перечень интеграций](04-arhitektura/4.3-perechen-integraciy.md)
-- [4.4. Схема и описание интеграции](04-arhitektura/4.4-shema-i-opisanie-integracii.md)
+    ---
 
-5\. Спроектированный API
+    Цели, метрики, бизнес-процессы и границы проекта.
 
-- [5.1. Ресурсы и эндпоинты](05-api/5.1-resursy-i-endpointy.md)
-- [5.2. Контракт метода POST /orders](05-api/5.2-kontrakt-metoda-post-orders.md)
-- [5.3. Спецификация OpenAPI](05-api/5.3-specifikaciya-openapi.md)
-- [5.4. Описание UI и взаимодействие с API](05-api/5.4-opisanie-ui-i-vzaimodeystvie-s-api.md)
+    [:octicons-arrow-right-24: Раздел 1](01-biznes-trebovaniya/1.1-obekt-avtomatizacii.md)
 
-- [6. Декомпозированные до задач требования](06-zadachi/index.md)
-    - [6.1. Критерии готовности к разработке (DoR)](06-zadachi/6.1-kriterii-gotovnosti-k-razrabotke-dor.md)
-    - [6.2. Критерии выполнения истории (DoD)](06-zadachi/6.2-kriterii-vypolneniya-istorii-dod.md)
-    - [6.3. Истории MVP](06-zadachi/6.3-istorii-mvp.md)
-    - [6.4. Истории Релиза 1](06-zadachi/6.4-istorii-reliza-1.md)
-    - [6.5. Истории Релиза 2](06-zadachi/6.5-istorii-reliza-2.md)
+- :material-file-document-outline:{ .lg .middle } __2. Требования к приложению__
 
-7\. Описание критериев готовности и проверки требований
+    ---
 
-- [7.1. Подход к проверке](07-proverka/7.1-podhod-k-proverke.md)
-- [7.2. Тест-кейсы MVP](07-proverka/7.2-test-keysy-mvp.md)
-- [7.3. Тест-кейсы Релиза 1](07-proverka/7.3-test-keysy-reliza-1.md)
-- [7.4. Чек-лист приемки](07-proverka/7.4-chek-list-priemki.md)
+    Роли, правила, нефункциональные требования и истории.
 
-- [Приложение А. Исходники схем](prilozhenie-a.md)
+    [:octicons-arrow-right-24: Раздел 2](02-trebovaniya/2.1-naznachenie-granicy-i-osnovaniya.md)
 
-## Спецификация API
+- :material-graph-outline:{ .lg .middle } __3. Информационная модель__
 
-[5.3. Спецификация OpenAPI](05-api/5.3-specifikaciya-openapi.md)
+    ---
 
-[Скачать order_api.yaml](api/order_api.yaml)
+    Сущности, связи, кратность и статусные модели.
+
+    [:octicons-arrow-right-24: Раздел 3](03-informacionnaya-model/3.1-naznachenie-modeli.md)
+
+- :material-sitemap:{ .lg .middle } __4. Компонентная архитектура__
+
+    ---
+
+    Компоненты, интеграции и поток заказа до табло.
+
+    [:octicons-arrow-right-24: Раздел 4](04-arhitektura/4.1-obosnovanie-vybora-arhitekturnogo-stilya.md)
+
+- :material-api:{ .lg .middle } __5. Спроектированный API__
+
+    ---
+
+    Ресурсы, контракт POST /orders и экраны.
+
+    [:octicons-arrow-right-24: Раздел 5](05-api/5.1-resursy-i-endpointy.md)
+
+- :material-format-list-checks:{ .lg .middle } __6. Задачи__
+
+    ---
+
+    Критерии готовности и декомпозиция историй.
+
+    [:octicons-arrow-right-24: Раздел 6](06-zadachi/index.md)
+
+- :material-clipboard-check-outline:{ .lg .middle } __7. Проверка требований__
+
+    ---
+
+    Тест-кейсы и чек-лист приемки.
+
+    [:octicons-arrow-right-24: Раздел 7](07-proverka/7.1-podhod-k-proverke.md)
+
+- :material-file-code-outline:{ .lg .middle } __Приложение А__
+
+    ---
+
+    Ссылки на исходный код схем PlantUML.
+
+    [:octicons-arrow-right-24: Приложение А](prilozhenie-a.md)
+
+</div>
+
+## Об авторе
+
+Липова Эльвира Евгеньевна, системный аналитик. 6 лет разработки на C# и 1 год системным аналитиком.
+
+<div class="home-author" markdown>
+
+[:fontawesome-brands-telegram: Эльвира Липова · От требований к коду](https://t.me/lipova_ee)
+
+</div>
+
+<p class="home-note">Учебный проект курса OTUS «Системный аналитик. Advanced», защита 7 декабря 2026. Ресторан, цифры и сроки смоделированы.</p>
