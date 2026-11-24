@@ -1,0 +1,3045 @@
+openapi: "3.0.3"
+info:
+  title: "API системы «Приложение для заказа + табло»"
+  version: "1.0.0"
+  description: "Ресурсы раздела 5 курсового проекта. Для каждого ресурса приведены схемы запроса и ответа, примеры и коды ошибок. Суммы — строка в рублях, например «450.00»."
+servers:
+  - url: "https://api.example.ru/api/v1"
+tags:
+  - name: "Меню"
+    description: "Меню, состав блюд и действующие акции"
+  - name: "Лояльность"
+    description: "Идентификация гостя во внешней системе лояльности"
+  - name: "Заказы"
+    description: "Проверка корзины, создание, отмена и статус заказа"
+  - name: "Оплата"
+    description: "Платежи на киоске и онлайн-оплата в приложении"
+  - name: "Чеки"
+    description: "Фискальные чеки и чеки возврата"
+  - name: "Возвраты"
+    description: "Оформление и подтверждение возвратов"
+  - name: "Кухня"
+    description: "Передача заказов на кухню и статусы производства"
+  - name: "Торговый день"
+    description: "Открытие, закрытие и статус торгового дня"
+  - name: "Табло"
+    description: "Номера и статусы заказов для табло"
+  - name: "Киоск"
+    description: "Поток событий и сбои киоска"
+  - name: "Панель персонала"
+    description: "Поиск заказов и уведомления о сбоях"
+  - name: "Отзывы"
+    description: "Оценки и отзывы гостей (Релиз 2)"
+  - name: "Отчеты"
+    description: "Отчеты для управляющего (Релиз 2)"
+paths:
+  /menu:
+    get:
+      tags:
+        - "Меню"
+      summary: "Меню"
+      description: "Меню: категории и вложенные категории, блюда в продаже, цены, состав блюд с признаками изменения и наценками, действующие акции. Клиент: Киоск, приложение."
+      security:
+        - deviceToken: []
+        - guestToken: []
+      responses:
+        "200":
+          description: "Меню"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Menu"
+              example:
+                categories:
+                  - categoryId: "a1a1a1a1-0000-4000-8000-000000000001"
+                    name: "Бургеры"
+                    parentCategoryId: null
+                  - categoryId: "a1a1a1a1-0000-4000-8000-000000000002"
+                    name: "Напитки"
+                    parentCategoryId: null
+                dishes:
+                  - dishId: "3f1c2a10-7b5e-4c1d-9a2b-1e2f3a4b5c6d"
+                    name: "Бургер классический"
+                    description: "Говядина, томат, лук, соус"
+                    price: "329.00"
+                    categoryIds:
+                      - "a1a1a1a1-0000-4000-8000-000000000001"
+                    composition:
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000001"
+                        name: "Сыр"
+                        inBaseComposition: false
+                        canExclude: false
+                        canAdd: true
+                        addSurcharge: "40.00"
+                        onSale: true
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000002"
+                        name: "Лук"
+                        inBaseComposition: true
+                        canExclude: true
+                        canAdd: false
+                        addSurcharge: "0.00"
+                        onSale: true
+                  - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                    name: "Морс 0,4 л"
+                    description: null
+                    price: "120.00"
+                    categoryIds:
+                      - "a1a1a1a1-0000-4000-8000-000000000002"
+                    composition: []
+                promotions:
+                  - promotionId: "PROMO-MORS-2FOR1"
+                    name: "2 по цене 1 на морс"
+                    type: "2 по цене 1"
+                    startsAt: "2026-10-01T00:00:00+03:00"
+                    endsAt: "2026-10-31T23:59:59+03:00"
+                    dailyStartTime: "12:00"
+                    dailyEndTime: "16:00"
+                    value: null
+                    status: "Активна"
+                    dishes:
+                      - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                        promoPrice: "60.00"
+                updatedAt: "2026-10-12T09:00:00+03:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /promotions:
+    get:
+      tags:
+        - "Меню"
+      summary: "Действующие акции с блюдами и ценой по акции"
+      description: "Действующие акции с блюдами и ценой по акции. Клиент: Киоск, приложение."
+      security:
+        - deviceToken: []
+        - guestToken: []
+      responses:
+        "200":
+          description: "Действующие акции"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromotionList"
+              example:
+                items:
+                  - promotionId: "PROMO-MORS-2FOR1"
+                    name: "2 по цене 1 на морс"
+                    type: "2 по цене 1"
+                    startsAt: "2026-10-01T00:00:00+03:00"
+                    endsAt: "2026-10-31T23:59:59+03:00"
+                    dailyStartTime: "12:00"
+                    dailyEndTime: "16:00"
+                    value: null
+                    status: "Активна"
+                    dishes:
+                      - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                        promoPrice: "60.00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /loyalty-identifications:
+    post:
+      tags:
+        - "Лояльность"
+      summary: "Идентификация по QR"
+      description: "Идентификация по QR: идентификатор гостя во внешней системе лояльности или признак анонимного заказа. Клиент: Киоск."
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoyaltyIdentificationRequest"
+            example:
+              qrCode: "LY:00012345:7f3a"
+      responses:
+        "200":
+          description: "Результат идентификации"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoyaltyIdentification"
+              example:
+                result: "Распознан"
+                loyaltyId: "LY-00012345"
+                anonymous: false
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /cart-checks:
+    post:
+      tags:
+        - "Заказы"
+      summary: "Проверка корзины"
+      description: "Проверка корзины: пересчет цен с акциями и наценками, исключение снятых с продажи блюд и добавок, сообщения об изменениях. Заказ не создается. Клиент: Киоск, приложение."
+      security:
+        - deviceToken: []
+        - guestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartCheckRequest"
+            example:
+              receiveType: "В зале"
+              loyaltyId: null
+              items:
+                - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                  quantity: 2
+      responses:
+        "200":
+          description: "Пересчитанная корзина"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartCheckResult"
+              example:
+                items:
+                  - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                    name: "Морс 0,4 л"
+                    quantity: 2
+                    unitPrice: "120.00"
+                    discountAmount: "0.00"
+                    surchargeAmount: "0.00"
+                    amount: "240.00"
+                    promotionId: null
+                    modifiers: []
+                total: "240.00"
+                changes:
+                  - type: "Акция истекла"
+                    dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                    promotionId: "PROMO-MORS-2FOR1"
+                    message: "Акция «2 по цене 1» закончилась, сумма пересчитана"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: "TRADING_DAY_CLOSED — торговый день закрыт"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders:
+    post:
+      tags:
+        - "Заказы"
+      summary: "Создание заказа из корзины"
+      operationId: "createOrder"
+      description: "Создает заказ в статусе «Создан». Сумма рассчитывается по актуальным ценам, акциям и наценкам и фиксируется в позициях. Номер заказа присваивается при оплате."
+      security:
+        - deviceToken: []
+        - guestToken: []
+      parameters:
+        - name: "Idempotency-Key"
+          in: "header"
+          required: true
+          description: "UUID попытки создания заказа"
+          schema:
+            type: "string"
+            format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: "Заказ создан"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "200":
+          description: "Повторный запрос с тем же Idempotency-Key, возвращен ранее созданный заказ"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/Unavailable"
+  /orders/{orderId}:
+    get:
+      tags:
+        - "Заказы"
+      summary: "Статус, номер и состав заказа"
+      description: "Статус, номер и состав заказа. Клиент: Киоск, приложение."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+        - guestToken: []
+      responses:
+        "200":
+          description: "Заказ"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+              example:
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                number: "A-042"
+                status: "Оплачен"
+                receiveType: "В зале"
+                loyaltyId: "LY-00012345"
+                items:
+                  - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000001"
+                    dishId: "3f1c2a10-7b5e-4c1d-9a2b-1e2f3a4b5c6d"
+                    name: "Бургер классический"
+                    quantity: 2
+                    unitPrice: "369.00"
+                    discountAmount: "0.00"
+                    surchargeAmount: "80.00"
+                    amount: "738.00"
+                    promotionId: null
+                    modifiers:
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000001"
+                        name: "Сыр"
+                        action: "Добавлен"
+                        surcharge: "40.00"
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000002"
+                        name: "Лук"
+                        action: "Исключен"
+                        surcharge: "0.00"
+                  - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000002"
+                    dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                    name: "Морс 0,4 л"
+                    quantity: 2
+                    unitPrice: "60.00"
+                    discountAmount: "120.00"
+                    surchargeAmount: "0.00"
+                    amount: "120.00"
+                    promotionId: "PROMO-MORS-2FOR1"
+                    modifiers: []
+                total: "858.00"
+                createdAt: "2026-10-12T12:30:15+03:00"
+                statusChangedAt: "2026-10-12T12:31:00+03:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/cancel:
+    post:
+      tags:
+        - "Заказы"
+      summary: "Отмена заказа гостем или при завершении сеанса"
+      description: "Отмена заказа гостем или при завершении сеанса. Клиент: Киоск, приложение."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+        - guestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelOrderRequest"
+            example:
+              reason: "Отмена гостем"
+      responses:
+        "200":
+          description: "Заказ отменен"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+              example:
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                number: null
+                status: "Отменен"
+                receiveType: "В зале"
+                loyaltyId: "LY-00012345"
+                items:
+                  - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000001"
+                    dishId: "3f1c2a10-7b5e-4c1d-9a2b-1e2f3a4b5c6d"
+                    name: "Бургер классический"
+                    quantity: 2
+                    unitPrice: "369.00"
+                    discountAmount: "0.00"
+                    surchargeAmount: "80.00"
+                    amount: "738.00"
+                    promotionId: null
+                    modifiers:
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000001"
+                        name: "Сыр"
+                        action: "Добавлен"
+                        surcharge: "40.00"
+                      - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000002"
+                        name: "Лук"
+                        action: "Исключен"
+                        surcharge: "0.00"
+                  - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000002"
+                    dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                    name: "Морс 0,4 л"
+                    quantity: 2
+                    unitPrice: "60.00"
+                    discountAmount: "120.00"
+                    surchargeAmount: "0.00"
+                    amount: "120.00"
+                    promotionId: "PROMO-MORS-2FOR1"
+                    modifiers: []
+                total: "858.00"
+                createdAt: "2026-10-12T12:30:15+03:00"
+                statusChangedAt: "2026-10-12T12:33:00+03:00"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "ORDER_NOT_CANCELLABLE — статус не «Создан» и не «Ошибка оплаты» или есть платеж «В обработке»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/stream:
+    get:
+      tags:
+        - "Заказы"
+      summary: "Поток статуса заказа (SSE, Релиз 1)"
+      description: "Поток статуса заказа (SSE, Релиз 1). Клиент: Приложение."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - guestToken: []
+      responses:
+        "200":
+          description: "Поток событий order-status, данные — схема OrderStatusEvent"
+          content:
+            text/event-stream:
+              schema:
+                type: "string"
+                description: "Строки event и data; data — JSON по схеме из описания ответа"
+              example: "event: order-status\ndata: {\"orderId\": \"b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e\", \"number\": \"A-042\", \"status\": \"Готов\", \"statusChangedAt\": \"2026-10-12T12:45:00+03:00\"}\n\n"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/payments:
+    post:
+      tags:
+        - "Оплата"
+      summary: "Создание платежа"
+      description: "Создание платежа: картой на киоске — в статусе «В обработке», наличными — «Успешно», в приложении — ссылка на оплату в платежном сервисе; приложение передает receiptEmail — e-mail для электронного чека. Клиент: Киоск, приложение."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "Idempotency-Key"
+          in: "header"
+          required: true
+          description: "UUID попытки"
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+        - guestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+            example:
+              method: "Карта"
+      responses:
+        "201":
+          description: "Платеж создан. Карта на киоске — «В обработке», наличные — «Успешно» и номер заказа, приложение — ссылка на оплату"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+              example:
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                method: "Карта"
+                status: "В обработке"
+                amount: "858.00"
+                createdAt: "2026-10-12T12:30:40+03:00"
+                externalTransactionId: null
+                paymentUrl: null
+                orderStatus: "Создан"
+                orderNumber: null
+        "200":
+          description: "Повторный запрос с тем же Idempotency-Key, возвращен ранее созданный платеж"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+              example:
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                method: "Карта"
+                status: "В обработке"
+                amount: "858.00"
+                createdAt: "2026-10-12T12:30:40+03:00"
+                externalTransactionId: null
+                paymentUrl: null
+                orderStatus: "Создан"
+                orderNumber: null
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "PAYMENT_IN_PROGRESS, ORDER_STATUS_CONFLICT или IDEMPOTENCY_CONFLICT"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /payments/{paymentId}/result:
+    post:
+      tags:
+        - "Оплата"
+      summary: "Итоговый ответ терминала оплаты: «Успешно», «Ошибка» или потеря сигнала"
+      description: "Итоговый ответ терминала оплаты: «Успешно», «Ошибка» или потеря сигнала. Клиент: Киоск."
+      parameters:
+        - name: "paymentId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TerminalResult"
+            example:
+              result: "Успешно"
+      responses:
+        "200":
+          description: "Платеж с итоговым статусом и статусом заказа"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+              example:
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                method: "Карта"
+                status: "Успешно"
+                amount: "858.00"
+                createdAt: "2026-10-12T12:30:40+03:00"
+                externalTransactionId: "RRN-628401937512"
+                paymentUrl: null
+                orderStatus: "Оплачен"
+                orderNumber: "A-042"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "PAYMENT_ALREADY_FINAL — платеж уже в итоговом статусе"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /payment-service/callbacks:
+    post:
+      tags:
+        - "Оплата"
+      summary: "Результат онлайн-оплаты и возврата (Релиз 1)"
+      description: "Результат онлайн-оплаты и возврата (Релиз 1). Клиент: Платежный сервис."
+      security:
+        - partnerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentServiceCallback"
+            example:
+              eventType: "Оплата"
+              paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+              refundId: null
+              externalTransactionId: "PS-55120934"
+              result: "Успешно"
+              occurredAt: "2026-10-12T12:31:00+03:00"
+      responses:
+        "204":
+          description: "Уведомление принято. Платежному сервису тело ответа не нужно"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /payments/{paymentId}/receipt:
+    post:
+      tags:
+        - "Чеки"
+      summary: "Результат печати фискального чека с номером заказа"
+      description: "Результат печати фискального чека с номером заказа: статус, номер фискального накопителя, номер фискального документа и фискальный признак. Клиент: Киоск."
+      parameters:
+        - name: "paymentId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReceiptResult"
+            example:
+              status: "Сформирован"
+              fiscalDriveNumber: "7380440700076549"
+              fiscalDocumentNumber: "1287"
+              fiscalSign: "3826745012"
+              issuedAt: "2026-10-12T12:31:05+03:00"
+      responses:
+        "201":
+          description: "Фискальный чек сохранен"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FiscalReceipt"
+              example:
+                receiptId: "e1d2c3b4-a5f6-4e7d-8c9b-0a1b2c3d4e5f"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                refundId: null
+                type: "Приход"
+                form: "Бумажный"
+                status: "Сформирован"
+                amount: "858.00"
+                issuedAt: "2026-10-12T12:31:05+03:00"
+                fiscalDriveNumber: "7380440700076549"
+                fiscalDocumentNumber: "1287"
+                fiscalSign: "3826745012"
+                email: null
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "RECEIPT_ALREADY_EXISTS — чек по платежу уже сохранен, повторной печати нет"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /cloud-cash/callbacks:
+    post:
+      tags:
+        - "Чеки"
+      summary: "Результат формирования электронного чека и чека возврата (Релиз 1)"
+      description: "Результат формирования электронного чека и чека возврата (Релиз 1). Клиент: Облачная касса."
+      security:
+        - partnerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudCashCallback"
+            example:
+              receiptId: "e1d2c3b4-a5f6-4e7d-8c9b-0a1b2c3d4e5f"
+              type: "Приход"
+              status: "Сформирован"
+              fiscalDriveNumber: "9960440300112233"
+              fiscalDocumentNumber: "5402"
+              fiscalSign: "2213456789"
+              issuedAt: "2026-10-12T12:31:20+03:00"
+              errorMessage: null
+      responses:
+        "204":
+          description: "Результат принят. Облачной кассе тело ответа не нужно"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /refunds/{refundId}/receipt:
+    post:
+      tags:
+        - "Чеки"
+      summary: "Результат печати чека возврата картой или наличными на фискальном регистраторе киоска"
+      description: "Результат печати чека возврата картой или наличными на фискальном регистраторе киоска. Клиент: Киоск."
+      parameters:
+        - name: "refundId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReceiptResult"
+            example:
+              status: "Сформирован"
+              fiscalDriveNumber: "7380440700076549"
+              fiscalDocumentNumber: "1287"
+              fiscalSign: "3826745012"
+              issuedAt: "2026-10-12T12:31:05+03:00"
+      responses:
+        "201":
+          description: "Чек возврата сохранен"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FiscalReceipt"
+              example:
+                receiptId: "e1d2c3b4-a5f6-4e7d-8c9b-0a1b2c3d4e5f"
+                paymentId: null
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                type: "Возврат прихода"
+                form: "Бумажный"
+                status: "Сформирован"
+                amount: "858.00"
+                issuedAt: "2026-10-12T13:05:20+03:00"
+                fiscalDriveNumber: "7380440700076549"
+                fiscalDocumentNumber: "1301"
+                fiscalSign: "1093847561"
+                email: null
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "RECEIPT_ALREADY_EXISTS — чек по возврату уже сохранен"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/refunds:
+    post:
+      tags:
+        - "Возвраты"
+      summary: "Оформление полного возврата"
+      description: "Оформление полного возврата. Клиент: Панель персонала."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "Idempotency-Key"
+          in: "header"
+          required: true
+          description: "UUID попытки"
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - staffToken: []
+      responses:
+        "201":
+          description: "Возврат создан"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+              example:
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                method: "Карта"
+                amount: "858.00"
+                status: "В обработке"
+                updatedAt: "2026-10-12T13:05:00+03:00"
+                employeeId: "e0000000-0000-4000-8000-000000000015"
+                orderStatus: "Готовится"
+        "200":
+          description: "Повторный запрос с тем же Idempotency-Key, возвращен ранее созданный возврат"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+              example:
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                method: "Карта"
+                amount: "858.00"
+                status: "В обработке"
+                updatedAt: "2026-10-12T13:05:00+03:00"
+                employeeId: "e0000000-0000-4000-8000-000000000015"
+                orderStatus: "Готовится"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "REFUND_NOT_ALLOWED — статус заказа не «Оплачен», «Готовится» или «Готов», либо возврат уже есть"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /refunds/{refundId}/retry:
+    post:
+      tags:
+        - "Возвраты"
+      summary: "Повторная попытка возврата"
+      description: "Повторная попытка возврата. Клиент: Панель персонала."
+      parameters:
+        - name: "refundId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - staffToken: []
+      responses:
+        "200":
+          description: "Повторная попытка начата, возврат «В обработке»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+              example:
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                method: "Карта"
+                amount: "858.00"
+                status: "В обработке"
+                updatedAt: "2026-10-12T13:05:00+03:00"
+                employeeId: "e0000000-0000-4000-8000-000000000015"
+                orderStatus: "Готовится"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "REFUND_NOT_RETRYABLE — возврат не в статусе «Отклонен» или «Ошибка»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /refunds/{refundId}/cash-confirmation:
+    post:
+      tags:
+        - "Возвраты"
+      summary: "Подтверждение возврата наличными после выдачи денег гостю"
+      description: "Подтверждение возврата наличными после выдачи денег гостю. Клиент: Панель персонала."
+      parameters:
+        - name: "refundId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - staffToken: []
+      responses:
+        "200":
+          description: "Возврат подтвержден, заказ «Возврат»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+              example:
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                method: "Наличные"
+                amount: "858.00"
+                status: "Подтвержден"
+                updatedAt: "2026-10-12T13:05:00+03:00"
+                employeeId: "e0000000-0000-4000-8000-000000000015"
+                orderStatus: "Возврат"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "REFUND_NOT_CASH — возврат не наличными или уже подтвержден"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /refunds/{refundId}/result:
+    post:
+      tags:
+        - "Возвраты"
+      summary: "Итоговый ответ терминала оплаты по возврату"
+      description: "Итоговый ответ терминала оплаты по возврату. Клиент: Киоск."
+      parameters:
+        - name: "refundId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TerminalResult"
+            example:
+              result: "Успешно"
+      responses:
+        "200":
+          description: "Возврат с итоговым статусом"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+              example:
+                refundId: "9a8b7c6d-5e4f-4a3b-2c1d-0e9f8a7b6c5d"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                paymentId: "5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a"
+                method: "Карта"
+                amount: "858.00"
+                status: "Подтвержден"
+                updatedAt: "2026-10-12T13:05:00+03:00"
+                employeeId: "e0000000-0000-4000-8000-000000000015"
+                orderStatus: "Возврат"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "REFUND_ALREADY_FINAL — возврат уже в итоговом статусе"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /kitchen/order-events:
+    post:
+      tags:
+        - "Кухня"
+      summary: "Сообщение кухни: заказ принят, готов, выдан"
+      description: "Сообщение кухни: заказ принят, готов, выдан. Клиент: Кухня."
+      security:
+        - partnerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KitchenOrderEvent"
+            example:
+              orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+              event: "Готов"
+              occurredAt: "2026-10-12T12:45:00+03:00"
+      responses:
+        "200":
+          description: "Событие обработано"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenEventResult"
+              example:
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                status: "Готов"
+                applied: true
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/kitchen-transfer:
+    post:
+      tags:
+        - "Кухня"
+      summary: "Повтор передачи заказа на кухню"
+      description: "Повтор передачи заказа на кухню. Клиент: Панель персонала."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - staffToken: []
+      responses:
+        "200":
+          description: "Результат повторной передачи"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenTransfer"
+              example:
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                result: "Принят"
+                orderStatus: "Готовится"
+                attemptedAt: "2026-10-12T12:40:00+03:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "ORDER_STATUS_CONFLICT — заказ не в статусе «Оплачен»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/DependencyUnavailable"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /trading-day:
+    get:
+      tags:
+        - "Торговый день"
+      summary: "Статус торгового дня"
+      description: "Статус торгового дня. Клиент: Киоск, приложение, панель персонала."
+      security:
+        - deviceToken: []
+        - guestToken: []
+      responses:
+        "200":
+          description: "Текущий торговый день"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradingDay"
+              example:
+                tradingDayId: "d0c0a0b0-1111-4222-8333-444455556666"
+                date: "2026-10-12"
+                status: "Открыт"
+                openedAt: "2026-10-12T08:55:00+03:00"
+                openedBy: "e0000000-0000-4000-8000-000000000015"
+                closedAt: null
+                closedBy: null
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /trading-day/open:
+    post:
+      tags:
+        - "Торговый день"
+      summary: "Открытие торгового дня"
+      description: "Открытие торгового дня. Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      responses:
+        "201":
+          description: "Торговый день открыт"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradingDay"
+              example:
+                tradingDayId: "d0c0a0b0-1111-4222-8333-444455556666"
+                date: "2026-10-12"
+                status: "Открыт"
+                openedAt: "2026-10-12T08:55:00+03:00"
+                openedBy: "e0000000-0000-4000-8000-000000000015"
+                closedAt: null
+                closedBy: null
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: "TRADING_DAY_ALREADY_OPEN — торговый день уже открыт"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /trading-day/close:
+    post:
+      tags:
+        - "Торговый день"
+      summary: "Закрытие торгового дня"
+      description: "Закрытие торгового дня. Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      responses:
+        "200":
+          description: "Торговый день закрыт"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradingDayClosed"
+              example:
+                tradingDay:
+                  tradingDayId: "d0c0a0b0-1111-4222-8333-444455556666"
+                  date: "2026-10-12"
+                  status: "Закрыт"
+                  openedAt: "2026-10-12T08:55:00+03:00"
+                  openedBy: "e0000000-0000-4000-8000-000000000015"
+                  closedAt: "2026-10-12T23:00:10+03:00"
+                  closedBy: "e0000000-0000-4000-8000-000000000015"
+                cancelledOrders: 2
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: "TRADING_DAY_CLOSED — торговый день уже закрыт"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /board/orders:
+    get:
+      tags:
+        - "Табло"
+      summary: "Номера и статусы заказов «Готовится» и «Готов»"
+      description: "Номера и статусы заказов «Готовится» и «Готов». Клиент: Табло."
+      security:
+        - deviceToken: []
+      responses:
+        "200":
+          description: "Заказы «Готовится» и «Готов»"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardOrderList"
+              example:
+                items:
+                  - number: "A-041"
+                    status: "Готовится"
+                  - number: "A-042"
+                    status: "Готов"
+                generatedAt: "2026-10-12T12:45:00+03:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /board/stream:
+    get:
+      tags:
+        - "Табло"
+      summary: "Поток статусов заказов (SSE)"
+      description: "Поток статусов заказов (SSE). Клиент: Табло."
+      security:
+        - deviceToken: []
+      responses:
+        "200":
+          description: "Поток событий board-order, данные — схема BoardOrder"
+          content:
+            text/event-stream:
+              schema:
+                type: "string"
+                description: "Строки event и data; data — JSON по схеме из описания ответа"
+              example: "event: board-order\ndata: {\"number\": \"A-042\", \"status\": \"Готов\"}\n\n"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /kiosk-incidents:
+    post:
+      tags:
+        - "Киоск"
+      summary: "Сбой на киоске"
+      description: "Сбой на киоске: перезапуск или бездействие гостя при внесенных наличных, сбой оплаты. Клиент: Киоск."
+      security:
+        - deviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KioskIncidentRequest"
+            example:
+              type: "Перезапуск при внесенных наличных"
+              orderId: null
+              paymentId: null
+              insertedAmount: "500.00"
+              occurredAt: "2026-10-12T12:50:00+03:00"
+              message: "Киоск перезапущен при внесенных наличных"
+      responses:
+        "201":
+          description: "Уведомление о сбое создано"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+              example:
+                notificationId: "f0e0d0c0-2222-4333-8444-555566667777"
+                deviceType: "Киоск"
+                deviceId: "KIOSK-03"
+                orderId: null
+                orderNumber: null
+                failureType: "Наличные без платежа"
+                message: "Киоск перезапущен при внесенных наличных 500.00"
+                createdAt: "2026-10-12T12:32:10+03:00"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /kiosk/stream:
+    get:
+      tags:
+        - "Киоск"
+      summary: "Поток для киоска (SSE)"
+      description: "Поток для киоска (SSE): режим работы, статус и номер заказа, команды возврата картой и печати чека возврата. Клиент: Киоск."
+      security:
+        - deviceToken: []
+      responses:
+        "200":
+          description: "Поток событий kiosk, данные — схема KioskEvent"
+          content:
+            text/event-stream:
+              schema:
+                type: "string"
+                description: "Строки event и data; data — JSON по схеме из описания ответа"
+              example: "event: kiosk\ndata: {\"type\": \"Статус заказа\", \"orderId\": \"b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e\", \"orderNumber\": \"A-042\", \"orderStatus\": \"Оплачен\", \"occurredAt\": \"2026-10-12T12:31:00+03:00\"}\n\n"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /staff/orders:
+    get:
+      tags:
+        - "Панель персонала"
+      summary: "Поиск заказа по номеру и статусу"
+      description: "Поиск заказа по номеру и статусу. Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      parameters:
+        - name: "number"
+          in: "query"
+          required: false
+          description: "Номер заказа"
+          schema:
+            type: "string"
+        - name: "status"
+          in: "query"
+          required: false
+          description: "Статус заказа"
+          schema:
+            $ref: "#/components/schemas/OrderStatus"
+        - name: "date"
+          in: "query"
+          required: false
+          description: "Дата торгового дня, по умолчанию текущий"
+          schema:
+            type: "string"
+            format: "date"
+      responses:
+        "200":
+          description: "Найденные заказы"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffOrderList"
+              example:
+                items:
+                  - orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                    number: "A-042"
+                    status: "Готовится"
+                    receiveType: "В зале"
+                    total: "858.00"
+                    createdAt: "2026-10-12T12:30:15+03:00"
+                    paymentMethod: "Карта"
+                    paidAt: "2026-10-12T12:31:00+03:00"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /notifications:
+    get:
+      tags:
+        - "Панель персонала"
+      summary: "Уведомления о сбоях"
+      description: "Уведомления о сбоях. Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      parameters:
+        - name: "since"
+          in: "query"
+          required: false
+          description: "Уведомления начиная с даты и времени"
+          schema:
+            type: "string"
+            format: "date-time"
+      responses:
+        "200":
+          description: "Уведомления о сбоях"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationList"
+              example:
+                items:
+                  - notificationId: "f0e0d0c0-2222-4333-8444-555566667777"
+                    deviceType: "Кухня"
+                    deviceId: null
+                    orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                    orderNumber: "A-042"
+                    failureType: "Передача на кухню"
+                    message: "Кухня не приняла заказ после первой попытки и трех повторов"
+                    createdAt: "2026-10-12T12:32:10+03:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}/rating:
+    post:
+      tags:
+        - "Отзывы"
+      summary: "Оценка и отзыв (Релиз 2)"
+      description: "Оценка и отзыв (Релиз 2). Клиент: Приложение."
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      security:
+        - guestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingRequest"
+            example:
+              rating: 5
+              comment: "Быстро и вкусно"
+      responses:
+        "201":
+          description: "Оценка сохранена"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+              example:
+                reviewId: "c3c3c3c3-4444-4555-8666-777788889999"
+                orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                orderNumber: "A-042"
+                orderDate: "2026-10-12"
+                rating: 5
+                comment: "Быстро и вкусно"
+                createdAt: "2026-10-12T14:10:00+03:00"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "RATING_EXISTS — заказ уже оценен"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "RATING_NOT_ALLOWED — заказ не «Выдан» или анонимный"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /reviews:
+    get:
+      tags:
+        - "Отзывы"
+      summary: "Оценки и отзывы за период (Релиз 2)"
+      description: "Оценки и отзывы за период (Релиз 2). Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      parameters:
+        - name: "from"
+          in: "query"
+          required: true
+          description: "Начало периода"
+          schema:
+            type: "string"
+            format: "date"
+        - name: "to"
+          in: "query"
+          required: true
+          description: "Конец периода"
+          schema:
+            type: "string"
+            format: "date"
+      responses:
+        "200":
+          description: "Оценки и отзывы за период"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewList"
+              example:
+                items:
+                  - reviewId: "c3c3c3c3-4444-4555-8666-777788889999"
+                    orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+                    orderNumber: "A-042"
+                    orderDate: "2026-10-12"
+                    rating: 5
+                    comment: "Быстро и вкусно"
+                    createdAt: "2026-10-12T14:10:00+03:00"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /reports:
+    get:
+      tags:
+        - "Отчеты"
+      summary: "Отчеты за период (Релиз 2)"
+      description: "Отчеты за период (Релиз 2). Клиент: Панель персонала."
+      security:
+        - staffToken: []
+      parameters:
+        - name: "from"
+          in: "query"
+          required: true
+          description: "Начало периода"
+          schema:
+            type: "string"
+            format: "date"
+        - name: "to"
+          in: "query"
+          required: true
+          description: "Конец периода"
+          schema:
+            type: "string"
+            format: "date"
+      responses:
+        "200":
+          description: "Отчет за период"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+              example:
+                periodFrom: "2026-10-01"
+                periodTo: "2026-10-31"
+                salesAmount: "1250400.00"
+                ordersCount: 2210
+                averageCheck: "565.79"
+                averagePreparationSeconds: 540
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        default:
+          description: "Ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  securitySchemes:
+    deviceToken:
+      type: "http"
+      scheme: "bearer"
+      description: "Токен киоска или табло"
+    staffToken:
+      type: "http"
+      scheme: "bearer"
+      description: "Токен сотрудника из Сервиса авторизации"
+    guestToken:
+      type: "http"
+      scheme: "bearer"
+      description: "Токен гостя из внешней системы лояльности"
+    partnerToken:
+      type: "http"
+      scheme: "bearer"
+      description: "Токен внешней системы: кухни, платежного сервиса или облачной кассы"
+  responses:
+    BadRequest:
+      description: "VALIDATION_ERROR — нет позиций или способа получения, неверный формат"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: "UNAUTHORIZED — нет токена или токен неверный"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: "FORBIDDEN — у роли нет права на операцию"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: "TRADING_DAY_CLOSED, TOTAL_CHANGED или IDEMPOTENCY_CONFLICT"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unprocessable:
+      description: "DISH_NOT_AVAILABLE или MODIFIER_NOT_ALLOWED"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalError:
+      description: "INTERNAL_ERROR"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: "VALIDATION_ERROR — неверный формат или нет обязательного поля"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: "NOT_FOUND — ресурс не найден"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    DependencyUnavailable:
+      description: "DEPENDENCY_UNAVAILABLE — недоступен внутренний сервис или внешняя система"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unavailable:
+      description: "DEPENDENCY_UNAVAILABLE — недоступен Сервис меню или Сервис торгового дня"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Money:
+      type: "string"
+      pattern: "^\\d+\\.\\d{2}$"
+      example: "450.00"
+    ReceiveType:
+      type: "string"
+      enum:
+        - "В зале"
+        - "С собой"
+    OrderStatus:
+      type: "string"
+      enum:
+        - "Создан"
+        - "Ошибка оплаты"
+        - "Оплачен"
+        - "Готовится"
+        - "Готов"
+        - "Выдан"
+        - "Возврат"
+        - "Отменен"
+    ModifierAction:
+      type: "string"
+      enum:
+        - "Исключен"
+        - "Добавлен"
+    ModifierInput:
+      type: "object"
+      required:
+        - "ingredientId"
+        - "action"
+      properties:
+        ingredientId:
+          type: "string"
+          format: "uuid"
+        action:
+          $ref: "#/components/schemas/ModifierAction"
+    OrderItemInput:
+      type: "object"
+      required:
+        - "dishId"
+        - "quantity"
+      properties:
+        dishId:
+          type: "string"
+          format: "uuid"
+        quantity:
+          type: "integer"
+          minimum: 1
+        modifiers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ModifierInput"
+    CreateOrderRequest:
+      type: "object"
+      required:
+        - "receiveType"
+        - "items"
+      properties:
+        receiveType:
+          $ref: "#/components/schemas/ReceiveType"
+        loyaltyId:
+          type: "string"
+          description: "Идентификатор гостя во внешней системе лояльности"
+        expectedTotal:
+          $ref: "#/components/schemas/Money"
+        items:
+          type: "array"
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/OrderItemInput"
+    OrderModifier:
+      type: "object"
+      required:
+        - "ingredientId"
+        - "name"
+        - "action"
+        - "surcharge"
+      properties:
+        ingredientId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        action:
+          $ref: "#/components/schemas/ModifierAction"
+        surcharge:
+          $ref: "#/components/schemas/Money"
+    OrderItem:
+      type: "object"
+      required:
+        - "itemId"
+        - "dishId"
+        - "name"
+        - "quantity"
+        - "unitPrice"
+        - "discountAmount"
+        - "surchargeAmount"
+        - "amount"
+        - "promotionId"
+        - "modifiers"
+      properties:
+        itemId:
+          type: "string"
+          format: "uuid"
+        dishId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        quantity:
+          type: "integer"
+        unitPrice:
+          $ref: "#/components/schemas/Money"
+        discountAmount:
+          $ref: "#/components/schemas/Money"
+        surchargeAmount:
+          $ref: "#/components/schemas/Money"
+        amount:
+          $ref: "#/components/schemas/Money"
+        promotionId:
+          type: "string"
+          nullable: true
+        modifiers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderModifier"
+    Order:
+      type: "object"
+      required:
+        - "orderId"
+        - "number"
+        - "status"
+        - "receiveType"
+        - "loyaltyId"
+        - "items"
+        - "total"
+        - "createdAt"
+        - "statusChangedAt"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        number:
+          type: "string"
+          nullable: true
+          description: "Присваивается при статусе «Оплачен»"
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        receiveType:
+          $ref: "#/components/schemas/ReceiveType"
+        loyaltyId:
+          type: "string"
+          nullable: true
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        total:
+          $ref: "#/components/schemas/Money"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        statusChangedAt:
+          type: "string"
+          format: "date-time"
+      example:
+        orderId: "b7e2c1d4-5f6a-4b3c-9d8e-7f6a5b4c3d2e"
+        number: null
+        status: "Создан"
+        receiveType: "В зале"
+        loyaltyId: "LY-00012345"
+        items:
+          - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000001"
+            dishId: "3f1c2a10-7b5e-4c1d-9a2b-1e2f3a4b5c6d"
+            name: "Бургер классический"
+            quantity: 2
+            unitPrice: "369.00"
+            discountAmount: "0.00"
+            surchargeAmount: "80.00"
+            amount: "738.00"
+            promotionId: null
+            modifiers:
+              - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000001"
+                name: "Сыр"
+                action: "Добавлен"
+                surcharge: "40.00"
+              - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000002"
+                name: "Лук"
+                action: "Исключен"
+                surcharge: "0.00"
+          - itemId: "0f9e8d7c-1111-4b3c-9d8e-000000000002"
+            dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+            name: "Морс 0,4 л"
+            quantity: 2
+            unitPrice: "60.00"
+            discountAmount: "120.00"
+            surchargeAmount: "0.00"
+            amount: "120.00"
+            promotionId: "PROMO-MORS-2FOR1"
+            modifiers: []
+        total: "858.00"
+        createdAt: "2026-10-12T12:30:15+03:00"
+        statusChangedAt: "2026-10-12T12:30:15+03:00"
+    ReceiptResult:
+      type: "object"
+      required:
+        - "status"
+      description: "Результат печати фискального чека с номером заказа или чека возврата на фискальном регистраторе киоска. Тип чека («Приход» или «Возврат прихода») определяется ресурсом: платеж или возврат"
+      properties:
+        status:
+          type: "string"
+          enum:
+            - "Сформирован"
+            - "Ошибка"
+        fiscalDriveNumber:
+          type: "string"
+          description: "Заводской номер фискального накопителя"
+        fiscalDocumentNumber:
+          type: "string"
+          description: "Номер фискального документа"
+        fiscalSign:
+          type: "string"
+          description: "Фискальный признак документа"
+        issuedAt:
+          type: "string"
+          format: "date-time"
+          description: "Дата и время чека"
+        errorMessage:
+          type: "string"
+    TerminalResult:
+      type: "object"
+      required:
+        - "result"
+      properties:
+        result:
+          type: "string"
+          enum:
+            - "Успешно"
+            - "Ошибка"
+            - "Потеря сигнала"
+    CreatePaymentRequest:
+      type: "object"
+      required:
+        - "method"
+      properties:
+        method:
+          type: "string"
+          enum:
+            - "Карта"
+            - "Наличные"
+        receiptEmail:
+          type: "string"
+          format: "email"
+          description: "E-mail для электронного чека и чека возврата. Обязателен при оплате в мобильном приложении"
+    Error:
+      type: "object"
+      description: "Единая схема ошибки"
+      required:
+        - "code"
+        - "message"
+      properties:
+        code:
+          type: "string"
+          example: "TRADING_DAY_CLOSED"
+        message:
+          type: "string"
+          example: "Прием заказов закрыт"
+        details:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          description: "Ошибки по полям для VALIDATION_ERROR"
+        recalculated:
+          allOf:
+            - $ref: "#/components/schemas/CartCheckResult"
+          description: "Пересчитанная корзина для TOTAL_CHANGED"
+    PaymentMethod:
+      type: "string"
+      enum:
+        - "Карта"
+        - "Наличные"
+    PaymentStatus:
+      type: "string"
+      enum:
+        - "В обработке"
+        - "Успешно"
+        - "Ошибка"
+    RefundStatus:
+      type: "string"
+      enum:
+        - "В обработке"
+        - "Подтвержден"
+        - "Отклонен"
+        - "Ошибка"
+    ReceiptType:
+      type: "string"
+      enum:
+        - "Приход"
+        - "Возврат прихода"
+    ReceiptForm:
+      type: "string"
+      enum:
+        - "Бумажный"
+        - "Электронный"
+    ReceiptStatus:
+      type: "string"
+      enum:
+        - "Сформирован"
+        - "Ошибка"
+    TradingDayStatus:
+      type: "string"
+      enum:
+        - "Открыт"
+        - "Закрыт"
+    PromotionType:
+      type: "string"
+      enum:
+        - "Спеццена"
+        - "Скидка"
+        - "2 по цене 1"
+    PromotionStatus:
+      type: "string"
+      enum:
+        - "Активна"
+        - "Неактивна"
+    Category:
+      type: "object"
+      required:
+        - "categoryId"
+        - "name"
+        - "parentCategoryId"
+      properties:
+        categoryId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        parentCategoryId:
+          type: "string"
+          format: "uuid"
+          description: "Родительская категория, для верхнего уровня пустое значение"
+          nullable: true
+    DishIngredient:
+      type: "object"
+      description: "Ингредиент в составе блюда с признаками изменения состава"
+      required:
+        - "ingredientId"
+        - "name"
+        - "inBaseComposition"
+        - "canExclude"
+        - "canAdd"
+        - "addSurcharge"
+        - "onSale"
+      properties:
+        ingredientId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        inBaseComposition:
+          type: "boolean"
+          description: "Входит в базовый состав"
+        canExclude:
+          type: "boolean"
+        canAdd:
+          type: "boolean"
+        addSurcharge:
+          $ref: "#/components/schemas/Money"
+        onSale:
+          type: "boolean"
+          description: "Признак «В продаже» ингредиента: доступность добавки"
+    Dish:
+      type: "object"
+      description: "Блюдо в продаже"
+      required:
+        - "dishId"
+        - "name"
+        - "price"
+        - "categoryIds"
+        - "composition"
+      properties:
+        dishId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        price:
+          $ref: "#/components/schemas/Money"
+        categoryIds:
+          type: "array"
+          items:
+            type: "string"
+            format: "uuid"
+          minItems: 1
+        composition:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DishIngredient"
+    PromotionDish:
+      type: "object"
+      required:
+        - "dishId"
+        - "promoPrice"
+      properties:
+        dishId:
+          type: "string"
+          format: "uuid"
+        promoPrice:
+          $ref: "#/components/schemas/Money"
+    Promotion:
+      type: "object"
+      required:
+        - "promotionId"
+        - "name"
+        - "type"
+        - "startsAt"
+        - "endsAt"
+        - "status"
+        - "dishes"
+      properties:
+        promotionId:
+          type: "string"
+        name:
+          type: "string"
+        type:
+          $ref: "#/components/schemas/PromotionType"
+        startsAt:
+          type: "string"
+          format: "date-time"
+        endsAt:
+          type: "string"
+          format: "date-time"
+        dailyStartTime:
+          type: "string"
+          pattern: "^\\d{2}:\\d{2}$"
+          description: "Время начала в течение дня"
+          nullable: true
+        dailyEndTime:
+          type: "string"
+          pattern: "^\\d{2}:\\d{2}$"
+          description: "Время окончания в течение дня"
+          nullable: true
+        value:
+          type: "string"
+          description: "Параметр типа акции из внешней системы"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/PromotionStatus"
+        dishes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/PromotionDish"
+          minItems: 1
+    Menu:
+      type: "object"
+      required:
+        - "categories"
+        - "dishes"
+        - "promotions"
+        - "updatedAt"
+      properties:
+        categories:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Category"
+        dishes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Dish"
+        promotions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Promotion"
+          description: "Только действующие акции"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    PromotionList:
+      type: "object"
+      required:
+        - "items"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Promotion"
+    LoyaltyIdentificationRequest:
+      type: "object"
+      required:
+        - "qrCode"
+      properties:
+        qrCode:
+          type: "string"
+          minLength: 1
+          description: "Содержимое QR внешней системы лояльности"
+    LoyaltyIdentification:
+      type: "object"
+      required:
+        - "result"
+        - "loyaltyId"
+        - "anonymous"
+      properties:
+        result:
+          type: "string"
+          enum:
+            - "Распознан"
+            - "Не распознан"
+            - "Система лояльности недоступна"
+        loyaltyId:
+          type: "string"
+          description: "Идентификатор гостя, только при результате «Распознан»"
+          nullable: true
+        anonymous:
+          type: "boolean"
+          description: "Заказ оформляется анонимно"
+    CartCheckRequest:
+      type: "object"
+      required:
+        - "items"
+      properties:
+        receiveType:
+          $ref: "#/components/schemas/ReceiveType"
+        loyaltyId:
+          type: "string"
+          nullable: true
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderItemInput"
+          minItems: 1
+    CartItem:
+      type: "object"
+      required:
+        - "dishId"
+        - "name"
+        - "quantity"
+        - "unitPrice"
+        - "discountAmount"
+        - "surchargeAmount"
+        - "amount"
+        - "promotionId"
+        - "modifiers"
+      properties:
+        dishId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        quantity:
+          type: "integer"
+          minimum: 1
+        unitPrice:
+          $ref: "#/components/schemas/Money"
+        discountAmount:
+          $ref: "#/components/schemas/Money"
+        surchargeAmount:
+          $ref: "#/components/schemas/Money"
+        amount:
+          $ref: "#/components/schemas/Money"
+        promotionId:
+          type: "string"
+          nullable: true
+        modifiers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderModifier"
+    CartChange:
+      type: "object"
+      required:
+        - "type"
+        - "dishId"
+        - "message"
+      properties:
+        type:
+          type: "string"
+          enum:
+            - "Блюдо снято с продажи"
+            - "Добавка снята с продажи"
+            - "Акция истекла"
+            - "Цена изменена"
+        dishId:
+          type: "string"
+          format: "uuid"
+        ingredientId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        promotionId:
+          type: "string"
+          nullable: true
+        message:
+          type: "string"
+    CartCheckResult:
+      type: "object"
+      description: "Пересчитанная корзина, заказ не создается"
+      required:
+        - "items"
+        - "total"
+        - "changes"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CartItem"
+        total:
+          $ref: "#/components/schemas/Money"
+        changes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CartChange"
+    CancelOrderRequest:
+      type: "object"
+      required:
+        - "reason"
+      properties:
+        reason:
+          type: "string"
+          enum:
+            - "Отмена гостем"
+            - "Завершение сеанса"
+    OrderStatusEvent:
+      type: "object"
+      description: "Данные события order-status потока SSE"
+      required:
+        - "orderId"
+        - "number"
+        - "status"
+        - "statusChangedAt"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        number:
+          type: "string"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        statusChangedAt:
+          type: "string"
+          format: "date-time"
+    Payment:
+      type: "object"
+      required:
+        - "paymentId"
+        - "orderId"
+        - "method"
+        - "status"
+        - "amount"
+        - "createdAt"
+        - "orderStatus"
+        - "orderNumber"
+      properties:
+        paymentId:
+          type: "string"
+          format: "uuid"
+        orderId:
+          type: "string"
+          format: "uuid"
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        amount:
+          $ref: "#/components/schemas/Money"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        externalTransactionId:
+          type: "string"
+          nullable: true
+        paymentUrl:
+          type: "string"
+          format: "uri"
+          description: "Ссылка на оплату в платежном сервисе, только для мобильного приложения"
+          nullable: true
+        orderStatus:
+          $ref: "#/components/schemas/OrderStatus"
+        orderNumber:
+          type: "string"
+          description: "Номер заказа, присваивается при статусе «Оплачен»"
+          nullable: true
+    PaymentServiceCallback:
+      type: "object"
+      required:
+        - "eventType"
+        - "paymentId"
+        - "externalTransactionId"
+        - "result"
+        - "occurredAt"
+      properties:
+        eventType:
+          type: "string"
+          enum:
+            - "Оплата"
+            - "Возврат"
+        paymentId:
+          type: "string"
+          format: "uuid"
+        refundId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        externalTransactionId:
+          type: "string"
+        result:
+          type: "string"
+          enum:
+            - "Успешно"
+            - "Ошибка"
+        occurredAt:
+          type: "string"
+          format: "date-time"
+    FiscalReceipt:
+      type: "object"
+      description: "Фискальный чек. Реквизиты ФН, ФД и ФПД пустые при статусе «Ошибка»"
+      required:
+        - "receiptId"
+        - "paymentId"
+        - "refundId"
+        - "type"
+        - "form"
+        - "status"
+        - "amount"
+        - "issuedAt"
+        - "fiscalDriveNumber"
+        - "fiscalDocumentNumber"
+        - "fiscalSign"
+        - "email"
+      properties:
+        receiptId:
+          type: "string"
+          format: "uuid"
+        paymentId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        refundId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        type:
+          $ref: "#/components/schemas/ReceiptType"
+        form:
+          $ref: "#/components/schemas/ReceiptForm"
+        status:
+          $ref: "#/components/schemas/ReceiptStatus"
+        amount:
+          $ref: "#/components/schemas/Money"
+        issuedAt:
+          type: "string"
+          format: "date-time"
+        fiscalDriveNumber:
+          type: "string"
+          nullable: true
+        fiscalDocumentNumber:
+          type: "string"
+          nullable: true
+        fiscalSign:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          format: "email"
+          nullable: true
+    CloudCashCallback:
+      type: "object"
+      required:
+        - "receiptId"
+        - "type"
+        - "status"
+        - "issuedAt"
+      properties:
+        receiptId:
+          type: "string"
+          format: "uuid"
+        type:
+          $ref: "#/components/schemas/ReceiptType"
+        status:
+          $ref: "#/components/schemas/ReceiptStatus"
+        fiscalDriveNumber:
+          type: "string"
+          nullable: true
+        fiscalDocumentNumber:
+          type: "string"
+          nullable: true
+        fiscalSign:
+          type: "string"
+          nullable: true
+        issuedAt:
+          type: "string"
+          format: "date-time"
+        errorMessage:
+          type: "string"
+          nullable: true
+    Refund:
+      type: "object"
+      description: "Полный возврат оплаты"
+      required:
+        - "refundId"
+        - "orderId"
+        - "paymentId"
+        - "method"
+        - "amount"
+        - "status"
+        - "updatedAt"
+        - "employeeId"
+        - "orderStatus"
+      properties:
+        refundId:
+          type: "string"
+          format: "uuid"
+        orderId:
+          type: "string"
+          format: "uuid"
+        paymentId:
+          type: "string"
+          format: "uuid"
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        amount:
+          $ref: "#/components/schemas/Money"
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          description: "Дата и время последней попытки возврата"
+        employeeId:
+          type: "string"
+          format: "uuid"
+        orderStatus:
+          $ref: "#/components/schemas/OrderStatus"
+    KitchenOrderEvent:
+      type: "object"
+      required:
+        - "orderId"
+        - "event"
+        - "occurredAt"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        event:
+          type: "string"
+          enum:
+            - "Принят"
+            - "Готов"
+            - "Выдан"
+        occurredAt:
+          type: "string"
+          format: "date-time"
+    KitchenEventResult:
+      type: "object"
+      required:
+        - "orderId"
+        - "status"
+        - "applied"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        applied:
+          type: "boolean"
+          description: "false — статус конечный, событие не изменило заказ"
+    KitchenTransfer:
+      type: "object"
+      required:
+        - "orderId"
+        - "result"
+        - "orderStatus"
+        - "attemptedAt"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        result:
+          type: "string"
+          enum:
+            - "Принят"
+            - "Не принят"
+        orderStatus:
+          $ref: "#/components/schemas/OrderStatus"
+        attemptedAt:
+          type: "string"
+          format: "date-time"
+    TradingDay:
+      type: "object"
+      description: "Торговый день; openedBy и closedBy — сотрудники из журнала операций"
+      required:
+        - "tradingDayId"
+        - "date"
+        - "status"
+        - "openedAt"
+        - "openedBy"
+        - "closedAt"
+        - "closedBy"
+      properties:
+        tradingDayId:
+          type: "string"
+          format: "uuid"
+        date:
+          type: "string"
+          format: "date"
+        status:
+          $ref: "#/components/schemas/TradingDayStatus"
+        openedAt:
+          type: "string"
+          format: "date-time"
+        openedBy:
+          type: "string"
+          format: "uuid"
+        closedAt:
+          type: "string"
+          format: "date-time"
+          nullable: true
+        closedBy:
+          type: "string"
+          format: "uuid"
+          nullable: true
+    TradingDayClosed:
+      type: "object"
+      required:
+        - "tradingDay"
+        - "cancelledOrders"
+      properties:
+        tradingDay:
+          $ref: "#/components/schemas/TradingDay"
+        cancelledOrders:
+          type: "integer"
+          minimum: 0
+          description: "Заказы «Создан» и «Ошибка оплаты» без платежа «В обработке», получившие статус «Отменен»"
+    BoardOrder:
+      type: "object"
+      required:
+        - "number"
+        - "status"
+      properties:
+        number:
+          type: "string"
+        status:
+          type: "string"
+          enum:
+            - "Готовится"
+            - "Готов"
+    BoardOrderList:
+      type: "object"
+      description: "Только номер и статус, без данных гостя"
+      required:
+        - "items"
+        - "generatedAt"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BoardOrder"
+        generatedAt:
+          type: "string"
+          format: "date-time"
+    KioskEvent:
+      type: "object"
+      description: "Данные события потока SSE киоска"
+      required:
+        - "type"
+        - "occurredAt"
+      properties:
+        type:
+          type: "string"
+          enum:
+            - "Режим работы"
+            - "Статус заказа"
+            - "Возврат картой"
+            - "Печать чека возврата"
+        tradingDayStatus:
+          type: "string"
+          enum:
+            - "Открыт"
+            - "Закрыт"
+          nullable: true
+        orderId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        orderNumber:
+          type: "string"
+          nullable: true
+        orderStatus:
+          type: "string"
+          enum:
+            - "Создан"
+            - "Ошибка оплаты"
+            - "Оплачен"
+            - "Готовится"
+            - "Готов"
+            - "Выдан"
+            - "Возврат"
+            - "Отменен"
+          nullable: true
+        refundId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        amount:
+          type: "string"
+          pattern: "^\\d+\\.\\d{2}$"
+          nullable: true
+        occurredAt:
+          type: "string"
+          format: "date-time"
+    KioskIncidentRequest:
+      type: "object"
+      required:
+        - "type"
+        - "occurredAt"
+        - "message"
+      properties:
+        type:
+          type: "string"
+          enum:
+            - "Перезапуск при внесенных наличных"
+            - "Бездействие при внесенных наличных"
+            - "Сбой оплаты"
+            - "Сбой печати чека"
+        orderId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        paymentId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        insertedAmount:
+          type: "string"
+          pattern: "^\\d+\\.\\d{2}$"
+          nullable: true
+          description: "Внесенная сумма без созданного платежа"
+        occurredAt:
+          type: "string"
+          format: "date-time"
+        message:
+          type: "string"
+    Notification:
+      type: "object"
+      description: "Уведомление о сбое: устройство, заказ и вид сбоя"
+      required:
+        - "notificationId"
+        - "deviceType"
+        - "deviceId"
+        - "orderId"
+        - "orderNumber"
+        - "failureType"
+        - "message"
+        - "createdAt"
+      properties:
+        notificationId:
+          type: "string"
+          format: "uuid"
+        deviceType:
+          type: "string"
+          enum:
+            - "Киоск"
+            - "Табло"
+            - "Мобильное приложение"
+            - "Кухня"
+        deviceId:
+          type: "string"
+          nullable: true
+        orderId:
+          type: "string"
+          format: "uuid"
+          nullable: true
+        orderNumber:
+          type: "string"
+          nullable: true
+        failureType:
+          type: "string"
+          enum:
+            - "Прием заказа"
+            - "Оплата"
+            - "Передача на кухню"
+            - "Обновление статуса"
+            - "Печать чека"
+            - "Наличные без платежа"
+        message:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    NotificationList:
+      type: "object"
+      required:
+        - "items"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Notification"
+    StaffOrder:
+      type: "object"
+      required:
+        - "orderId"
+        - "number"
+        - "status"
+        - "receiveType"
+        - "total"
+        - "createdAt"
+        - "paymentMethod"
+        - "paidAt"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        number:
+          type: "string"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        receiveType:
+          $ref: "#/components/schemas/ReceiveType"
+        total:
+          $ref: "#/components/schemas/Money"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        paymentMethod:
+          type: "string"
+          enum:
+            - "Карта"
+            - "Наличные"
+          nullable: true
+        paidAt:
+          type: "string"
+          format: "date-time"
+          nullable: true
+        refund:
+          allOf:
+            - $ref: "#/components/schemas/Refund"
+          description: "Есть, если по заказу оформлен возврат"
+    StaffOrderList:
+      type: "object"
+      required:
+        - "items"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/StaffOrder"
+    RatingRequest:
+      type: "object"
+      required:
+        - "rating"
+      properties:
+        rating:
+          type: "integer"
+          minimum: 1
+          maximum: 5
+        comment:
+          type: "string"
+          maxLength: 1000
+    Review:
+      type: "object"
+      required:
+        - "reviewId"
+        - "orderId"
+        - "orderNumber"
+        - "orderDate"
+        - "rating"
+        - "comment"
+        - "createdAt"
+      properties:
+        reviewId:
+          type: "string"
+          format: "uuid"
+        orderId:
+          type: "string"
+          format: "uuid"
+        orderNumber:
+          type: "string"
+        orderDate:
+          type: "string"
+          format: "date"
+        rating:
+          type: "integer"
+          minimum: 1
+          maximum: 5
+        comment:
+          type: "string"
+          nullable: true
+        createdAt:
+          type: "string"
+          format: "date-time"
+    ReviewList:
+      type: "object"
+      required:
+        - "items"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Review"
+    Report:
+      type: "object"
+      description: "Заказы «Возврат» и «Отменен» в продажи не входят"
+      required:
+        - "periodFrom"
+        - "periodTo"
+        - "salesAmount"
+        - "ordersCount"
+        - "averageCheck"
+        - "averagePreparationSeconds"
+      properties:
+        periodFrom:
+          type: "string"
+          format: "date"
+        periodTo:
+          type: "string"
+          format: "date"
+        salesAmount:
+          $ref: "#/components/schemas/Money"
+        ordersCount:
+          type: "integer"
+          minimum: 0
+        averageCheck:
+          $ref: "#/components/schemas/Money"
+        averagePreparationSeconds:
+          type: "integer"
+          minimum: 0
+          description: "Среднее время от «Готовится» до «Готов», с"
+    ErrorDetail:
+      type: "object"
+      required:
+        - "field"
+        - "message"
+      properties:
+        field:
+          type: "string"
+        message:
+          type: "string"
