@@ -109,7 +109,7 @@ markdown_extensions:
 extra:
   generator: false
 extra_css:
-  - stylesheets/extra.css
+  - stylesheets/extra.css?v=2
 validation:
   absolute_links: warn
   unrecognized_links: warn

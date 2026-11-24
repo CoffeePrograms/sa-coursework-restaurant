@@ -44,11 +44,21 @@
   text-decoration: none;
 }
 
-.md-copyright .footer-tg svg {
-  width: 1rem;
-  height: 1rem;
-  vertical-align: -0.2em;
-  margin-right: 0.2em;
+.md-footer-meta .md-copyright .footer-tg {
+  display: inline;
+  white-space: nowrap;
+}
+
+.md-footer-meta .md-copyright .footer-tg-icon,
+.md-footer-meta .md-copyright .footer-tg svg {
+  width: 1em;
+  height: 1em;
+  max-width: 1em;
+  max-height: 1em;
+  display: inline-block;
+  vertical-align: -0.15em;
+  margin-right: 0.25em;
+  fill: #26a5e4;
 }
 
 .stat-row {
@@ -128,6 +138,17 @@
   --md-typeset-a-color: #f5c400;
 }
 
+/* primary в mkdocs.yml — blue grey, атрибут data-md-color-primary="blue-grey".
+   Палитра Material красит шапку в #546d78. Перебиваем тем же селектором. */
+[data-md-color-primary="blue-grey"] {
+  --md-primary-fg-color: #111111;
+  --md-primary-fg-color--light: #2a2a2a;
+  --md-primary-fg-color--dark: #000000;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffb3;
+}
+
+[data-md-color-primary="blue-grey"] .md-header,
 .md-header {
   background-color: #111111;
   color: #ffffff;
