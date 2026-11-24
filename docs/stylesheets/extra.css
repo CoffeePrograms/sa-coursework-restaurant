@@ -45,3 +45,105 @@
   flex-shrink: 0;
 }
 
+/* Палитра иконки: черный, желтый #F5C400, белый.
+   Ссылки в светлой теме темнее желтого, чтобы пройти WCAG AA на белом. */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #111111;
+  --md-primary-fg-color--light: #2a2a2a;
+  --md-primary-fg-color--dark: #000000;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffb3;
+  --md-accent-fg-color: #f5c400;
+  --md-accent-fg-color--transparent: #f5c40026;
+  --md-typeset-a-color: #946f00;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1a1a1a;
+  --md-default-fg-color: #f2f2f2;
+  --md-default-fg-color--light: #c8c8c8;
+  --md-default-fg-color--lighter: #9a9a9a;
+  --md-default-fg-color--lightest: #3a3a3a;
+  --md-code-bg-color: #111111;
+  --md-code-fg-color: #f2f2f2;
+  --md-footer-bg-color: #111111;
+  --md-footer-bg-color--dark: #0c0c0c;
+  --md-primary-fg-color: #111111;
+  --md-primary-fg-color--light: #2a2a2a;
+  --md-primary-fg-color--dark: #000000;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffb3;
+  --md-accent-fg-color: #f5c400;
+  --md-accent-fg-color--transparent: #f5c40026;
+  --md-typeset-a-color: #f5c400;
+}
+
+.md-header {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.md-header .md-header__button,
+.md-header .md-header__title,
+.md-header .md-ellipsis,
+.md-header .md-logo {
+  color: #ffffff;
+}
+
+.md-search__input {
+  color: #ffffff;
+}
+
+.md-search__input::placeholder {
+  color: #ffffffb3;
+}
+
+.md-header__button.md-logo img,
+.md-nav__button.md-logo img {
+  height: 2rem;
+  width: 2rem;
+}
+
+.md-typeset .md-button--primary {
+  background-color: #f5c400;
+  border-color: #f5c400;
+  color: #111111;
+}
+
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:focus {
+  background-color: #e0b200;
+  border-color: #e0b200;
+  color: #111111;
+}
+
+.md-typeset .md-button:not(.md-button--primary) {
+  color: #946f00;
+  border-color: #946f00;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .md-button:not(.md-button--primary) {
+  color: #f5c400;
+  border-color: #f5c400;
+}
+
+.md-typeset .grid.cards .twemoji {
+  color: #f5c400;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  border-color: #f5c400;
+  box-shadow: 0 0.15rem 0.5rem #f5c40033;
+}
+
+.md-nav__link--active,
+.md-nav__item--active > .md-nav__link {
+  color: #946f00;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active,
+[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
+  color: #f5c400;
+}
+
