@@ -46,7 +46,7 @@
 }
 
 /* Палитра иконки: черный, желтый #F5C400, белый.
-   Ссылки в светлой теме темнее желтого, чтобы пройти WCAG AA на белом. */
+   Ссылки в светлой теме #6B4F00: контраст на белом около 7.6:1. */
 :root,
 [data-md-color-scheme="default"] {
   --md-primary-fg-color: #111111;
@@ -56,7 +56,7 @@
   --md-primary-bg-color--light: #ffffffb3;
   --md-accent-fg-color: #f5c400;
   --md-accent-fg-color--transparent: #f5c40026;
-  --md-typeset-a-color: #946f00;
+  --md-typeset-a-color: #6b4f00;
 }
 
 [data-md-color-scheme="slate"] {
@@ -87,8 +87,14 @@
 .md-header .md-header__button,
 .md-header .md-header__title,
 .md-header .md-ellipsis,
-.md-header .md-logo {
+.md-header .md-logo,
+.md-header form[data-md-component="palette"] label.md-header__button {
   color: #ffffff;
+}
+
+.md-header form[data-md-component="palette"] label.md-header__button svg,
+.md-header .md-header__button svg {
+  fill: currentColor;
 }
 
 .md-search__input {
@@ -118,9 +124,9 @@
   color: #111111;
 }
 
-.md-typeset .md-button:not(.md-button--primary) {
-  color: #946f00;
-  border-color: #946f00;
+[data-md-color-scheme="default"] .md-typeset .md-button:not(.md-button--primary) {
+  color: #111111;
+  border-color: #111111;
 }
 
 [data-md-color-scheme="slate"] .md-typeset .md-button:not(.md-button--primary) {
@@ -128,7 +134,11 @@
   border-color: #f5c400;
 }
 
-.md-typeset .grid.cards .twemoji {
+[data-md-color-scheme="default"] .md-typeset .grid.cards .twemoji {
+  color: #111111;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards .twemoji {
   color: #f5c400;
 }
 
@@ -137,9 +147,9 @@
   box-shadow: 0 0.15rem 0.5rem #f5c40033;
 }
 
-.md-nav__link--active,
-.md-nav__item--active > .md-nav__link {
-  color: #946f00;
+[data-md-color-scheme="default"] .md-nav__link--active,
+[data-md-color-scheme="default"] .md-nav__item--active > .md-nav__link {
+  color: #6b4f00;
 }
 
 [data-md-color-scheme="slate"] .md-nav__link--active,
