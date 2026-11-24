@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   description: "Ресурсы раздела 5 курсового проекта. Для каждого ресурса приведены схемы запроса и ответа, примеры и коды ошибок. Суммы — строка в рублях, например «450.00»."
 servers:
-  - url: "https://api.example.ru/api/v1"
+  - url: "/api/v1"
 tags:
   - name: "Меню"
     description: "Меню, состав блюд и действующие акции"
@@ -282,6 +282,20 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateOrderRequest"
+            example:
+              receiveType: "В зале"
+              loyaltyId: "LY-00012345"
+              expectedTotal: "858.00"
+              items:
+                - dishId: "3f1c2a10-7b5e-4c1d-9a2b-1e2f3a4b5c6d"
+                  quantity: 2
+                  modifiers:
+                    - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000001"
+                      action: "Добавлен"
+                    - ingredientId: "c1a2b3c4-0000-4a1b-8c2d-000000000002"
+                      action: "Исключен"
+                - dishId: "8a7b6c5d-4e3f-4a1b-8c2d-9e0f1a2b3c4d"
+                  quantity: 2
       responses:
         "201":
           description: "Заказ создан"
@@ -1206,6 +1220,7 @@ paths:
       security:
         - deviceToken: []
         - guestToken: []
+        - staffToken: []
       responses:
         "200":
           description: "Текущий торговый день"
