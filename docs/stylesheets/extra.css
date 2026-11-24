@@ -28,6 +28,15 @@
   margin: 0.85rem 0.5rem 0 0;
 }
 
+.md-typeset .home-hero a .twemoji {
+  margin-right: 0.2em;
+  vertical-align: -0.15em;
+}
+
+.md-typeset .home-hero a .twemoji svg {
+  fill: currentColor;
+}
+
 .md-typeset .grid.cards {
   margin-top: 1.75rem;
 }

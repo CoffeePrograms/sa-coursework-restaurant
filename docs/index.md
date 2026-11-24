@@ -10,7 +10,7 @@ icon: material/home
 
 Курсовой проект, OTUS «Системный аналитик. Advanced», 2026
 
-Липова Эльвира Евгеньевна · Telegram: [@lipova_ee](https://t.me/lipova_ee)
+Липова Эльвира Евгеньевна · [:fontawesome-brands-telegram: @lipova_ee](https://t.me/lipova_ee)
 
 [Начать читать](01-biznes-trebovaniya/1.1-obekt-avtomatizacii.md){ .md-button .md-button--primary }
 [Спецификация API](05-api/5.3-specifikaciya-openapi.md){ .md-button }
